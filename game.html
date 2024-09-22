@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>剪刀石頭布遊戲</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- SweetAlert2 -->
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 70vh;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            text-align: center;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .buttons img {
+            width: 100px;
+            height: 100px;
+            margin: 0 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .buttons img:hover {
+            transform: scale(1.2);
+        }
+        .result {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+        .win {
+            color: green;
+        }
+        .lose {
+            color: red;
+        }
+        .draw {
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+        <h1>剪刀石頭布遊戲</h1>
+        <div class="buttons">
+            <img src="scissors.png" id="scissors" alt="剪刀">
+            <img src="stone.png" id="stone" alt="石頭">
+            <img src="paper.png" id="paper" alt="布">
+        </div>
+        <div class="result" id="result">請選擇一個選項</div>
+        <div class="score" id="score">玩家: 0 電腦: 0</div>
+    </div>
+
+    <script>
+        const choices = ['scissors','stone', 'paper' ];
+        let playerScore = 0;
+        let computerScore = 0;
+        const winSound = new Audio('win.mp3'); 
+        const loseSound = new Audio('lose.mp3'); 
+        const drawSound = new Audio('draw.mp3'); 
+        document.getElementById('scissors').addEventListener('click', () => playGame('scissors'));
+        document.getElementById('stone').addEventListener('click', () => playGame('stone'));
+        document.getElementById('paper').addEventListener('click', () => playGame('paper'));
+
+        function playGame(playerChoice) {
+        const computerChoice = choices[Math.floor(Math.random() * 3)];
+        let resultText = '';
+        let resultClass = '';
+
+        if (playerChoice === computerChoice) {
+            resultText = '平手！';
+            resultClass = 'draw';
+            drawSound.play();
+        } else if (
+            (playerChoice === 'stone' && computerChoice === 'scissors') ||
+            (playerChoice === 'scissors' && computerChoice === 'paper') ||
+            (playerChoice === 'paper' && computerChoice === 'stone')
+        ) {
+            resultText = '你贏了！';
+            resultClass = 'win';
+            winSound.play();
+            playerScore++;
+        } else {
+            resultText = '你輸了！';
+            resultClass = 'lose';
+            loseSound.play();
+            computerScore++;
+        }
+
+        const resultElement = document.getElementById('result');
+        resultElement.innerText = `你選擇了 ${playerChoice}，電腦選擇了 ${computerChoice}。${resultText}`;
+
+        resultElement.classList.remove('win', 'lose', 'draw');
+        resultElement.classList.add(resultClass);
+
+        document.getElementById('score').innerText = `玩家: ${playerScore} 電腦: ${computerScore}`;
+
+        if (playerScore === 3 || computerScore === 3) {
+            let winner = playerScore === 3 ? '玩家' : '電腦';
+            document.body.style.overflow = 'hidden';
+            Swal.fire({
+                title: `${winner} 獲勝！`,
+                text: '遊戲將重新開始。',
+                icon: 'success',
+                confirmButtonText: '重新開始',
+                heightAuto: false  
+            }).then(() => {
+                resetGame();
+                document.body.style.overflow = 'auto';
+            });
+        }
+    }
+
+
+        function resetGame() {
+            playerScore = 0;
+            computerScore = 0;
+            document.getElementById('score').innerText = '玩家: 0 電腦: 0';
+            document.getElementById('result').innerText = '請選擇一個選項';
+        }
+    </script>
+</body>
+</html>
